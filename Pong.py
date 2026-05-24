@@ -41,7 +41,7 @@ class Paddle:
     def Draw(self, surface):
         global Text, FONT_SCORE
         pygame.draw.rect(surface, PURPLE, self.rect, border_radius=14)
-        FONT_SCORE =  pygame.font.SysFont("Arial", 50, italic=True)
+        FONT_SCORE =  pygame.font.SysFont("Arial", 25)
         Text = FONT_SCORE.render("Score: ", True, WHITE)
         
 
@@ -71,7 +71,7 @@ class Paddle_2(Paddle):
 
     def Draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=14)
-        FONT_SCORE =  pygame.font.SysFont("Arial", 50, italic=True)
+        FONT_SCORE =  pygame.font.SysFont("Arial", 25)
         Text = FONT_SCORE.render('Score: '+ str(Score_A), True, WHITE)
 
     def Move(self, keys):
@@ -174,11 +174,11 @@ def main():
         ball.Draw(WINDOW)
 
         # Display Scores
-        FONT_SCORE = pygame.font.SysFont("Arial", 50, italic=True)
+        FONT_SCORE = pygame.font.SysFont("Arial", 25)
         Text_A = FONT_SCORE.render('Score A: ' + str(Score_A), True, WHITE)
         Text_B = FONT_SCORE.render('Score B: ' + str(Score_B), True, WHITE)
-        WINDOW.blit(Text_A, (150, 0))
-        WINDOW.blit(Text_B, (500, 0))
+        WINDOW.blit(Text_A, (200 - Text_A.get_width() // 2, 35))
+        WINDOW.blit(Text_B, (600 - Text_B.get_width() // 2, 35))
 
         # Line
         pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
