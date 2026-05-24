@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from pygame.locals import *
 
 pygame.init()
@@ -17,6 +18,15 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 PURPLE = (142, 68, 173)
 
+# Load background image (optional)
+bg = None
+bg_path = os.path.join(os.path.dirname(__file__), "bg.png")
+try:
+    bg = pygame.image.load(bg_path).convert()
+    bg = pygame.transform.scale(bg, (WIDTH, HEIGHT))
+except Exception as e:
+    bg = None
+    print("Warning: couldn't load bg.png:", e)
 
 class Paddle:
     def __init__(self, x, y, width, height):
@@ -146,7 +156,11 @@ def main():
 
         keys = pygame.key.get_pressed()
 
-        WINDOW.fill(BLACK)
+        # Draw background (image if available)
+        if bg:
+            WINDOW.blit(bg, (0, 0))
+        else:
+            WINDOW.fill(BLACK)
 
         # Paddle 1
         paddle1.Draw(WINDOW)
