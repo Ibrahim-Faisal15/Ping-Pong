@@ -54,13 +54,13 @@ class Paddle:
             self.velocity_y += self.init_velocity
 
         self.y += self.velocity_y
-        self.rect.y = self.y
 
-        #Border
-        if self.y <= 3:
-            self.y = 0
-        elif self.y >= 500:
-            self.y = 490
+        if self.y < 32:
+            self.y = 32
+        elif self.y > 476:
+            self.y = 476
+
+        self.rect.y = self.y
 
         
 
@@ -83,14 +83,13 @@ class Paddle_2(Paddle):
             self.velocity_y += self.init_velocity
 
         self.y += self.velocity_y
+
+        if self.y < 32:
+            self.y = 32
+        elif self.y > 476:
+            self.y = 476
+
         self.rect.y = self.y
-
-
-             #Border
-        if self.y <= 3:
-            self.y = 0
-        elif self.y >= 500:
-            self.y = 490
 
 class Ball(object):
     def __init__(self, x, y, color):
