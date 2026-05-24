@@ -17,6 +17,9 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 PURPLE = (142, 68, 173)
+NEON_BLUE = (0, 191, 255)
+NEON_ORANGE = (255, 110, 0)
+TENNIS_YELLOW = (200, 255, 0)
 
 # Load background image (optional)
 bg = None
@@ -29,18 +32,19 @@ except Exception as e:
     print("Warning: couldn't load bg.png:", e)
 
 class Paddle:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, color):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.color = color
         self.velocity_y = 0
         self.init_velocity = 10
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def Draw(self, surface):
         global Text, FONT_SCORE
-        pygame.draw.rect(surface, PURPLE, self.rect, border_radius=14)
+        pygame.draw.rect(surface, self.color, self.rect, border_radius=14)
         FONT_SCORE =  pygame.font.SysFont("Arial", 25)
         Text = FONT_SCORE.render("Score: ", True, WHITE)
         
@@ -66,8 +70,7 @@ class Paddle:
 
 class Paddle_2(Paddle):
     def __init__(self, x, y, width, height, color):
-        super().__init__(x, y, width, height)
-        self.color = color
+        super().__init__(x, y, width, height, color)
 
     def Draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=14)
@@ -151,9 +154,9 @@ class Ball(object):
 
 # Game Variables
 clock = pygame.time.Clock()
-paddle1 = Paddle(50, HEIGHT // 2 - 50, 25, 100)
-paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2 - 50, 25, 100, GREEN)
-ball = Ball(WIDTH//2, HEIGHT//2, RED)
+paddle1 = Paddle(50, HEIGHT // 2 - 50, 25, 100, NEON_BLUE)
+paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2 - 50, 25, 100, NEON_ORANGE)
+ball = Ball(WIDTH//2, HEIGHT//2, TENNIS_YELLOW)
 Score_A = 0
 Score_B = 0
 game_started = False
