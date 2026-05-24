@@ -180,6 +180,13 @@ def main():
         WINDOW.blit(Text_A, (200 - Text_A.get_width() // 2, 35))
         WINDOW.blit(Text_B, (600 - Text_B.get_width() // 2, 35))
 
+        # Display Controls
+        FONT_CONTROLS = pygame.font.SysFont("Arial", 16)
+        Text_Controls_A = FONT_CONTROLS.render('Controls: W / S', True, (200, 200, 200))
+        Text_Controls_B = FONT_CONTROLS.render('Controls: UP / DOWN', True, (200, 200, 200))
+        WINDOW.blit(Text_Controls_A, (200 - Text_Controls_A.get_width() // 2, 550))
+        WINDOW.blit(Text_Controls_B, (600 - Text_Controls_B.get_width() // 2, 550))
+
         # Line
         pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
 
