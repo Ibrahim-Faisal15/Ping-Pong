@@ -107,6 +107,7 @@ class Ball(object):
         self.velocity_x = -self.velocity_x
 
     def Move(self):
+        global game_started
         self.x += self.velocity_x
         self.y += self.velocity_y
 
@@ -122,12 +123,22 @@ class Ball(object):
             Score_B += 10
             print("Score B:", Score_B)
             self.reset()
+            paddle1.y = HEIGHT // 2 - 50
+            paddle1.rect.y = paddle1.y
+            paddle2.y = HEIGHT // 2 - 50
+            paddle2.rect.y = paddle2.y
+            game_started = False
 
         elif self.x > 778:
             global Score_A
             Score_A += 10
             print("Score A:", Score_A)
             self.reset()
+            paddle1.y = HEIGHT // 2 - 50
+            paddle1.rect.y = paddle1.y
+            paddle2.y = HEIGHT // 2 - 50
+            paddle2.rect.y = paddle2.y
+            game_started = False
 
         if paddle2.rect.colliderect(self.x - 20, self.y - 20, 40, 40):
             self.velocity_x = -self.velocity_x
@@ -140,15 +151,17 @@ class Ball(object):
 
 # Game Variables
 clock = pygame.time.Clock()
-paddle1 = Paddle(50, HEIGHT // 2, 25, 100)
-paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2, 25, 100, GREEN)
+paddle1 = Paddle(50, HEIGHT // 2 - 50, 25, 100)
+paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2 - 50, 25, 100, GREEN)
 ball = Ball(WIDTH//2, HEIGHT//2, RED)
 Score_A = 0
 Score_B = 0
+game_started = False
 
 
 
 def main():
+    global Score_A, Score_B, game_started
     run = True
 
     while run:
@@ -156,6 +169,18 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_RETURN or event.key == K_KP_ENTER:
+                    game_started = True
+                elif event.key == K_SPACE:
+                    Score_A = 0
+                    Score_B = 0
+                    ball.reset()
+                    paddle1.y = HEIGHT // 2 - 50
+                    paddle1.rect.y = paddle1.y
+                    paddle2.y = HEIGHT // 2 - 50
+                    paddle2.rect.y = paddle2.y
+                    game_started = False
 
         keys = pygame.key.get_pressed()
 
@@ -165,17 +190,19 @@ def main():
         else:
             WINDOW.fill(BLACK)
 
+        # Line & Center Circle
+        pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
+        pygame.draw.circle(WINDOW, WHITE, (WIDTH // 2, HEIGHT // 2), 60, 6)
+
         # Paddle 1
         paddle1.Draw(WINDOW)
-        paddle1.Move(keys)
+        if game_started:
+            paddle1.Move(keys)
 
         # Paddle 2
         paddle2.Draw(WINDOW)
-        paddle2.Move(keys)
-
-        # Ball
-        ball.Move()
-        ball.Draw(WINDOW)
+        if game_started:
+            paddle2.Move(keys)
 
         # Display Scores
         FONT_SCORE = pygame.font.SysFont("Arial", 25)
@@ -186,14 +213,15 @@ def main():
 
         # Display Controls
         FONT_CONTROLS = pygame.font.SysFont("Arial", 16)
-        Text_Controls_A = FONT_CONTROLS.render('Controls: W / S', True, (200, 200, 200))
-        Text_Controls_B = FONT_CONTROLS.render('Controls: UP / DOWN', True, (200, 200, 200))
+        Text_Controls_A = FONT_CONTROLS.render('Controls: W / S  |  SPACE to Restart', True, (200, 200, 200))
+        Text_Controls_B = FONT_CONTROLS.render('Controls: UP / DOWN  |  ENTER to Start', True, (200, 200, 200))
         WINDOW.blit(Text_Controls_A, (200 - Text_Controls_A.get_width() // 2, 550))
         WINDOW.blit(Text_Controls_B, (600 - Text_Controls_B.get_width() // 2, 550))
 
-        # Line & Center Circle
-        pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
-        pygame.draw.circle(WINDOW, WHITE, (WIDTH // 2, HEIGHT // 2), 60, 6)
+        # Ball (drawn in front of lines)
+        if game_started:
+            ball.Move()
+        ball.Draw(WINDOW)
 
         pygame.display.update()
         clock.tick(60)
