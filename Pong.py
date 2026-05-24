@@ -108,19 +108,23 @@ class Ball(object):
         self.x += self.velocity_x
         self.y += self.velocity_y
 
-        if self.y < 0 + 15 or self.y > HEIGHT - 15:
+        if self.y < 38:
+            self.y = 38
+            self.velocity_y = -self.velocity_y
+        elif self.y > 569:
+            self.y = 569
             self.velocity_y = -self.velocity_y
 
-        if self.x < 0 + 15:
+        if self.x < 37:
+            self.x = 37
             self.velocity_x = -self.velocity_x
-            # Increase Score_B by 10 when the ball hits the left edge
             global Score_B
             Score_B += 10
             print("Score B:", Score_B)
 
-        elif self.x > WIDTH - 15:
+        elif self.x > 763:
+            self.x = 763
             self.velocity_x = -self.velocity_x
-            # Increase Score_A by 10 when the ball hits the right edge
             global Score_A
             Score_A += 10
             print("Score A:", Score_A)
