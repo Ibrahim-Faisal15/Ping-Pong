@@ -100,9 +100,11 @@ class Ball(object):
         self.color = color
     def Draw(self, surface):
         pygame.draw.circle(surface, self.color, (self.x, self.y), 15, 0)
-#
-        
-       
+
+    def reset(self):
+        self.x = WIDTH // 2
+        self.y = HEIGHT // 2
+        self.velocity_x = -self.velocity_x
 
     def Move(self):
         self.x += self.velocity_x
@@ -115,19 +117,17 @@ class Ball(object):
             self.y = 569
             self.velocity_y = -self.velocity_y
 
-        if self.x < 37:
-            self.x = 37
-            self.velocity_x = -self.velocity_x
+        if self.x < 22:
             global Score_B
             Score_B += 10
             print("Score B:", Score_B)
+            self.reset()
 
-        elif self.x > 763:
-            self.x = 763
-            self.velocity_x = -self.velocity_x
+        elif self.x > 778:
             global Score_A
             Score_A += 10
             print("Score A:", Score_A)
+            self.reset()
 
         if paddle2.rect.colliderect(self.x - 20, self.y - 20, 40, 40):
             self.velocity_x = -self.velocity_x
@@ -191,8 +191,9 @@ def main():
         WINDOW.blit(Text_Controls_A, (200 - Text_Controls_A.get_width() // 2, 550))
         WINDOW.blit(Text_Controls_B, (600 - Text_Controls_B.get_width() // 2, 550))
 
-        # Line
+        # Line & Center Circle
         pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
+        pygame.draw.circle(WINDOW, WHITE, (WIDTH // 2, HEIGHT // 2), 60, 6)
 
         pygame.display.update()
         clock.tick(60)
