@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from pygame.locals import *
 
 pygame.init()
@@ -16,22 +17,35 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 PURPLE = (142, 68, 173)
+NEON_BLUE = (0, 191, 255)
+NEON_ORANGE = (255, 110, 0)
+TENNIS_YELLOW = (200, 255, 0)
 
+# Load background image (optional)
+bg = None
+bg_path = os.path.join(os.path.dirname(__file__), "bg.png")
+try:
+    bg = pygame.image.load(bg_path).convert()
+    bg = pygame.transform.scale(bg, (WIDTH, HEIGHT))
+except Exception as e:
+    bg = None
+    print("Warning: couldn't load bg.png:", e)
 
 class Paddle:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, color):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.color = color
         self.velocity_y = 0
         self.init_velocity = 10
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def Draw(self, surface):
         global Text, FONT_SCORE
-        pygame.draw.rect(surface, PURPLE, self.rect, border_radius=14)
-        FONT_SCORE =  pygame.font.SysFont("Arial", 50, italic=True)
+        pygame.draw.rect(surface, self.color, self.rect, border_radius=14)
+        FONT_SCORE =  pygame.font.SysFont("Arial", 25)
         Text = FONT_SCORE.render("Score: ", True, WHITE)
         
 
@@ -44,24 +58,23 @@ class Paddle:
             self.velocity_y += self.init_velocity
 
         self.y += self.velocity_y
-        self.rect.y = self.y
 
-        #Border
-        if self.y <= 3:
-            self.y = 0
-        elif self.y >= 500:
-            self.y = 490
+        if self.y < 32:
+            self.y = 32
+        elif self.y > 476:
+            self.y = 476
+
+        self.rect.y = self.y
 
         
 
 class Paddle_2(Paddle):
     def __init__(self, x, y, width, height, color):
-        super().__init__(x, y, width, height)
-        self.color = color
+        super().__init__(x, y, width, height, color)
 
     def Draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=14)
-        FONT_SCORE =  pygame.font.SysFont("Arial", 50, italic=True)
+        FONT_SCORE =  pygame.font.SysFont("Arial", 25)
         Text = FONT_SCORE.render('Score: '+ str(Score_A), True, WHITE)
 
     def Move(self, keys):
@@ -73,14 +86,13 @@ class Paddle_2(Paddle):
             self.velocity_y += self.init_velocity
 
         self.y += self.velocity_y
+
+        if self.y < 32:
+            self.y = 32
+        elif self.y > 476:
+            self.y = 476
+
         self.rect.y = self.y
-
-
-             #Border
-        if self.y <= 3:
-            self.y = 0
-        elif self.y >= 500:
-            self.y = 490
 
 class Ball(object):
     def __init__(self, x, y, color):
@@ -91,30 +103,45 @@ class Ball(object):
         self.color = color
     def Draw(self, surface):
         pygame.draw.circle(surface, self.color, (self.x, self.y), 15, 0)
-#
-        
-       
+
+    def reset(self):
+        self.x = WIDTH // 2
+        self.y = HEIGHT // 2
+        self.velocity_x = -self.velocity_x
 
     def Move(self):
+        global game_started
         self.x += self.velocity_x
         self.y += self.velocity_y
 
-        if self.y < 0 + 15 or self.y > HEIGHT - 15:
+        if self.y < 38:
+            self.y = 38
+            self.velocity_y = -self.velocity_y
+        elif self.y > 569:
+            self.y = 569
             self.velocity_y = -self.velocity_y
 
-        if self.x < 0 + 15:
-            self.velocity_x = -self.velocity_x
-            # Increase Score_B by 10 when the ball hits the left edge
+        if self.x < 22:
             global Score_B
             Score_B += 10
             print("Score B:", Score_B)
+            self.reset()
+            paddle1.y = HEIGHT // 2 - 50
+            paddle1.rect.y = paddle1.y
+            paddle2.y = HEIGHT // 2 - 50
+            paddle2.rect.y = paddle2.y
+            game_started = False
 
-        elif self.x > WIDTH - 15:
-            self.velocity_x = -self.velocity_x
-            # Increase Score_A by 10 when the ball hits the right edge
+        elif self.x > 778:
             global Score_A
             Score_A += 10
             print("Score A:", Score_A)
+            self.reset()
+            paddle1.y = HEIGHT // 2 - 50
+            paddle1.rect.y = paddle1.y
+            paddle2.y = HEIGHT // 2 - 50
+            paddle2.rect.y = paddle2.y
+            game_started = False
 
         if paddle2.rect.colliderect(self.x - 20, self.y - 20, 40, 40):
             self.velocity_x = -self.velocity_x
@@ -127,15 +154,17 @@ class Ball(object):
 
 # Game Variables
 clock = pygame.time.Clock()
-paddle1 = Paddle(50, HEIGHT // 2, 25, 100)
-paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2, 25, 100, GREEN)
-ball = Ball(WIDTH//2, HEIGHT//2, RED)
+paddle1 = Paddle(50, HEIGHT // 2 - 50, 25, 100, NEON_BLUE)
+paddle2 = Paddle_2(WIDTH-75, HEIGHT // 2 - 50, 25, 100, NEON_ORANGE)
+ball = Ball(WIDTH//2, HEIGHT//2, TENNIS_YELLOW)
 Score_A = 0
 Score_B = 0
+game_started = False
 
 
 
 def main():
+    global Score_A, Score_B, game_started
     run = True
 
     while run:
@@ -143,32 +172,59 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_RETURN or event.key == K_KP_ENTER:
+                    game_started = True
+                elif event.key == K_SPACE:
+                    Score_A = 0
+                    Score_B = 0
+                    ball.reset()
+                    paddle1.y = HEIGHT // 2 - 50
+                    paddle1.rect.y = paddle1.y
+                    paddle2.y = HEIGHT // 2 - 50
+                    paddle2.rect.y = paddle2.y
+                    game_started = False
 
         keys = pygame.key.get_pressed()
 
-        WINDOW.fill(BLACK)
+        # Draw background (image if available)
+        if bg:
+            WINDOW.blit(bg, (0, 0))
+        else:
+            WINDOW.fill(BLACK)
+
+        # Line & Center Circle
+        pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
+        pygame.draw.circle(WINDOW, WHITE, (WIDTH // 2, HEIGHT // 2), 60, 6)
 
         # Paddle 1
         paddle1.Draw(WINDOW)
-        paddle1.Move(keys)
+        if game_started:
+            paddle1.Move(keys)
 
         # Paddle 2
         paddle2.Draw(WINDOW)
-        paddle2.Move(keys)
-
-        # Ball
-        ball.Move()
-        ball.Draw(WINDOW)
+        if game_started:
+            paddle2.Move(keys)
 
         # Display Scores
-        FONT_SCORE = pygame.font.SysFont("Arial", 50, italic=True)
+        FONT_SCORE = pygame.font.SysFont("Arial", 25)
         Text_A = FONT_SCORE.render('Score A: ' + str(Score_A), True, WHITE)
         Text_B = FONT_SCORE.render('Score B: ' + str(Score_B), True, WHITE)
-        WINDOW.blit(Text_A, (150, 0))
-        WINDOW.blit(Text_B, (500, 0))
+        WINDOW.blit(Text_A, (200 - Text_A.get_width() // 2, 35))
+        WINDOW.blit(Text_B, (600 - Text_B.get_width() // 2, 35))
 
-        # Line
-        pygame.draw.line(WINDOW, WHITE, (WIDTH / 2, 0), (WIDTH / 2, 600), 8)
+        # Display Controls
+        FONT_CONTROLS = pygame.font.SysFont("Arial", 16)
+        Text_Controls_A = FONT_CONTROLS.render('Controls: W / S  |  SPACE to Restart', True, (200, 200, 200))
+        Text_Controls_B = FONT_CONTROLS.render('Controls: UP / DOWN  |  ENTER to Start', True, (200, 200, 200))
+        WINDOW.blit(Text_Controls_A, (200 - Text_Controls_A.get_width() // 2, 550))
+        WINDOW.blit(Text_Controls_B, (600 - Text_Controls_B.get_width() // 2, 550))
+
+        # Ball (drawn in front of lines)
+        if game_started:
+            ball.Move()
+        ball.Draw(WINDOW)
 
         pygame.display.update()
         clock.tick(60)
